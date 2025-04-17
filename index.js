@@ -7,6 +7,8 @@ app.set("view engine", "ejs")
 app.use(express.urlencoded())
 
 
+let todos = [];
+
 let userarray = []
  app.get("/user",(request , response)=>{
     //  response.send("Welcome to Your Node Class")
@@ -42,6 +44,12 @@ let userarray = []
 
  })
 
+ app.get("/todo",(req, res)=>{
+
+   res.render("addToDo",{todos})
+
+})
+
  app.get("/login",(req,res)=>{
     res.render("login")
  })
@@ -67,6 +75,37 @@ let userarray = []
    res.redirect('/login')
   }
    
+ })
+
+
+ app.post("/addtodo",(req,res)=>{
+   console.log(req.body);
+   todos.push(req.body)
+   console.log(todos);
+   res.redirect("/todo")
+ })
+
+
+ app.post("/todo/delete",(req, res)=>{
+   console.log(req.body.index);
+   const index = req.body.index
+   todos.splice(index, 1)
+   res.redirect("/todo")
+ })
+
+ app.get("/todo/edit/:index",(req,res)=>{
+
+    const index = req.params.index
+    const onetodo = todos[index]
+   //  console.log(todos[index]);
+    res.render("edit",{index, onetodo})
+ })
+
+ app.post("/todo/update/:index",(req, res)=>{
+  console.log(req.body);
+  const index = req.params.index
+  todos[index] = req.body
+  res.redirect("/todo")
  })
 
 const port = 7000
