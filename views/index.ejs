@@ -15,10 +15,14 @@
 
     <form class="w-50 mx-auto px-3 py-3 shadow rounded-md" action="/signup" method="post">
         <h1 class="text-muted text-center">Sign Up</h1>
+        <% if (message) { %>
+            <small class="alert alert-danger"><%= message %></small>
+        <% } %>        
         <input class="form-control mt-3" placeholder="Username" name="username"  type="text">
         <input class="form-control mt-3" placeholder="Email" name="email" type="text">
         <input class="form-control mt-3" placeholder="Password" name="password" type="text">
         <button type="submit" class="btn btn-dark mt-3">Signup</button>
+        <p>Already Signup? <a href="/login">Login</a></p>
     </form>
 </body>
 </html>

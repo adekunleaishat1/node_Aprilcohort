@@ -1,14 +1,25 @@
 const express = require("express")
  const app = express()
 const ejs = require("ejs")
+const mongoose = require("mongoose")
 
 
 app.set("view engine", "ejs")
 app.use(express.urlencoded())
 
+// CRUD  CREATE READ UPDATE DELETE
+
+
+const userschema = mongoose.Schema({
+   username:{type:String,required:true,trim:true},
+   email:{type:String, unique:true, required:true,trim:true},
+   password:{type:String, required:true, trim:true},
+},{timestamps:true})
+
+const usermodel = mongoose.model("user_collection", userschema)
 
 let todos = [];
-
+let message;
 let userarray = []
  app.get("/user",(request , response)=>{
     //  response.send("Welcome to Your Node Class")
@@ -40,7 +51,7 @@ let userarray = []
 
  app.get("/",(req, res)=>{
 
-    res.render("index",{name:"shola"})
+    res.render("index",{name:"shola", message})
 
  })
 
@@ -51,28 +62,50 @@ let userarray = []
 })
 
  app.get("/login",(req,res)=>{
-    res.render("login")
+    res.render("login",{message})
  })
 
- app.post("/signup",(req, res)=>{
+ app.post("/signup", async(req, res)=>{
+  try {
    console.log(req.body);
-   userarray.push(req.body)
-   console.log(userarray);
-    res.redirect("/login")
+   const {username, email, password} = req.body
+   if (!username || !email || !password) {
+      message = "all fields are mandatory"
+      console.log("all fields are mandatory");
+      res.redirect("/")
+   }else{
+    const existuser =  await usermodel.findOne({email})
+    console.log(existuser);
+    if (!existuser) {
+          const user = await usermodel.create(req.body)
+      console.log(user);
+      res.redirect("/login")
+     }else{
+         message = "user already exist, Please login!!!"
+         res.redirect("/")
+     }
+    }
+  } catch (error) {
+    console.log(error);
+    
+  }
  })
 
- app.post("/user/login", (req, res)=>{
+ app.post("/user/login", async (req, res)=>{
+  try {
    console.log(req.body);
    const {email , password} = req.body
-  const existuser = userarray.find((user)=> user.email === email)
-  console.log(existuser);
-  
-  if (existuser && existuser.password == password) {
-    console.log("login successful");
-    res.redirect('/user')
-  }else{
-   console.log("User does not exist");
-   res.redirect('/login')
+   const validuser = await usermodel.findOne({email})
+     console.log(validuser);
+     if (validuser && validuser.password == password) {
+      res.redirect("/todo")
+     }else{
+      message = "Invalid user"
+      res.redirect("/login")
+     }
+     
+  } catch (error) {
+   console.log(error);
   }
    
  })
@@ -108,8 +141,28 @@ let userarray = []
   res.redirect("/todo")
  })
 
+
+
+
+ const uri = "mongodb+srv://aishatadekunle877:aishat@cluster0.t92x8pf.mongodb.net/aprilcohort?retryWrites=true&w=majority&appName=Cluster0"
+
+ const Connect = async () =>{
+   try {
+    const connection = await mongoose.connect(uri)
+    if (connection) {
+      console.log("database connected successfully");
+      
+    }
+   } catch (error) {
+      console.log(error);
+      
+   }
+ }
+Connect()
+
 const port = 7000
  app.listen(port,()=>{
   console.log(`app started at port ${port}`);
   
  })
+

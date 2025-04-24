@@ -9,6 +9,9 @@
 </head>
 <body>
     <form class="w-50 mx-auto px-3 py-3 shadow rounded-md" action="/user/login" method="post">
+        <% if (message) { %>
+            <small class="alert alert-danger"><%= message %></small>
+        <% } %>       
         <h1 class="text-muted text-center">Login</h1>
         <input class="form-control mt-3" placeholder="Email" name="email" type="text">
         <input class="form-control mt-3" placeholder="Password" name="password" type="text">
